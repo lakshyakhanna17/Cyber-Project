@@ -48,6 +48,13 @@
           <!-- flagged websites -->
           <div class="panel" id="flagged">
             <div class="panel-head"><h3>Flagged Websites</h3><a href="report.html" class="pill-tag">View more</a></div>
+            <div id="flagged-header">
+              <span></span>
+              <span>Domain</span>
+              <span>Type</span>
+              <span class="risk-col">Risk</span>
+            </div>
+
             <div id="flagged-list"></div>
           </div>
 
@@ -81,11 +88,13 @@
     document.getElementById("flagged-list").innerHTML = data.flaggedList
       .map(
         (f) => `
-      <div class="alert-row">
+      <div class="flagged-row">
         <span class="dot dot-danger"></span>
-        <span class="url">${f.host}</span>
-        <span class="pill-tag">${f.type}</span>
-        <span class="time">risk ${f.risk}</span>
+        <span class="domain-col">${f.host}</span>
+        <span class="type-col">
+          <span class="pill-tag">${f.type}</span>
+        </span>
+        <span class="risk-col">${f.risk}</span>
       </div>`
       )
       .join("");
@@ -106,20 +115,21 @@
         .join("") || '<p class="muted">No threats in window.</p>';
 
     // live alert feed
-    function renderAlerts() {
+      function renderAlerts() {
       document.getElementById("alert-list").innerHTML = data.alerts
-        .map(
-          (a) => `
-        <div class="alert-row">
-          <span class="dot dot-${a.sev}"></span>
-          <span class="url">${a.host}</span>
+      .map(
+      (a) => `
+      <div class="flagged-row">
+        <span class="dot dot-${a.sev}"></span>
+        <span class="domain-col">${a.host}</span>
+        <span class="type-col">
           <span class="pill-tag">${a.type}</span>
-          <span class="time">${a.time}</span>
-        </div>`
-        )
-        .join("");
-    }
-    renderAlerts();
+        </span>
+        <span class="time-col">${a.time}</span>
+      </div>`
+      )
+      .join("");
+      }
 
     // simulate a new alert arriving
     setInterval(() => {

@@ -80,7 +80,6 @@ function renderRibbon(active) {
     <a class="rib-logo" href="index.html" title="Home">${icon("logo")}</a>
     ${links}
     <div class="rib-spacer"></div>
-    <button class="rib-item rib-toggle-theme" onclick="toggleTheme()" title="Toggle theme">${icon("theme")}<span class="label">Theme</span></button>
     <a class="rib-item" href="index.html" title="Settings">${icon("settings")}<span class="label">Settings</span></a>
   `;
 }
