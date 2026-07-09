@@ -6,155 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CyberWeb — Analysis Report</title>
   <meta name="description" content="Detailed threat analysis report with scan, cyber intel and sandbox results." />
-  <meta name="theme-color" content="#0a0e17" />
+  <meta name="theme-color" content="#0a0b0a" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  
-  <style>
-    :root {
-      --bg: #0a0e17;
-      --bg-2: #0d1424;
-      --panel: #121a2b;
-      --panel-2: #0e1524;
-      --border: #202a42;
-      --border-2: #283255;
-      --text: #eef1f8;
-      --muted: #8b93ac;
-      --accent: #5b8cff;
-      --accent-soft: rgba(91, 140, 255, 0.14);
-      --danger: #ef5468;
-      --warn: #f0a857;
-      --ok: #3ea6ff;
-      --font-display: "Chakra Petch", "Space Grotesk", sans-serif;
-      --font-body: "Inter", system-ui, sans-serif;
-      --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-    }
-
-    html[data-theme="light"] {
-      --bg: #f4f6fb;
-      --bg-2: #ffffff;
-      --panel: #ffffff;
-      --panel-2: #eef1f8;
-      --border: #dde3f0;
-      --border-2: #cbd4e6;
-      --text: #161b28;
-      --muted: #5b6478;
-      --accent: #3e63e0;
-      --accent-soft: rgba(62, 99, 224, 0.10);
-      --danger: #d9435a;
-      --warn: #c9812a;
-      --ok: #2f7fd1;
-    }
-
-    /* Technical/raw values read better in monospace on a security dashboard */
-    #r-url,
-    .alert-row .time,
-    .stat-card .v,
-    .gauge .ring .val {
-      font-family: var(--font-mono);
-    }
-    .stat-card .v { letter-spacing: -0.02em; }
-
-    /* Screenshot capture panel (Sandbox tab) */
-    .screenshot-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-      padding: 22px;
-    }
-    .screenshot-card {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--panel-2);
-    }
-    .screenshot-frame {
-      position: relative;
-      aspect-ratio: 16 / 10;
-      background: var(--panel-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .screenshot-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top;
-      display: block;
-    }
-    .screenshot-frame::after {
-      content: "Screenshot not available";
-      display: none;
-      color: var(--muted);
-      font-size: 0.8rem;
-      text-align: center;
-      padding: 0 16px;
-    }
-    .screenshot-missing .screenshot-frame img { display: none; }
-    .screenshot-missing .screenshot-frame::after { display: block; }
-    .screenshot-caption {
-      padding: 10px 14px;
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-    }
-    @media (max-width: 640px) {
-      .screenshot-grid { grid-template-columns: 1fr; }
-    }
-
-    /* Behaviour Summary table */
-    .behaviour-table {
-      width: 100%;
-      table-layout: fixed;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-    .behaviour-table th {
-      background: var(--panel-2);
-      color: var(--muted);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 600;
-      text-align: left;
-      padding: 14px 22px;
-      border-bottom: 1px solid var(--border);
-    }
-    .behaviour-table th:nth-child(1),
-    .behaviour-table td:nth-child(1) {
-      width: 56%;
-    }
-    .behaviour-table th:nth-child(2),
-    .behaviour-table td:nth-child(2) {
-      width: 22%;
-      text-align: left;
-    }
-    .behaviour-table th:nth-child(3),
-    .behaviour-table td:nth-child(3) {
-      width: 22%;
-    }
-    .behaviour-table td {
-      padding: 13px 22px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .behaviour-table tr:last-child td { border-bottom: none; }
-    .behaviour-table tr:hover td { background: var(--panel-2); }
-    .behaviour-table td:nth-child(2) {
-      font-family: var(--font-mono);
-      font-weight: 600;
-    }
-    .val-ok { color: var(--ok); }
-    .val-warn { color: var(--warn); }
-    .val-danger { color: var(--danger); }
-  </style>
 </head>
 
 <body data-page="report">
@@ -185,22 +42,22 @@
           <div style="padding:22px" class="grid grid-4">
             <div>
               <div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">
-                Source URL</div>
+                Full URL</div>
               <div id="r-url" style="word-break:break-all">—</div>
             </div>
             <div>
               <div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">
-                Scan Start Time</div>
+                Scanned</div>
               <div id="r-time">—</div>
             </div>
             <div>
               <div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">
-                Page Load Time</div>
-              <div id="r-loadtime">—</div>
+                Risk Score</div>
+              <div id="r-risk">—</div>
             </div>
             <div>
               <div class="k" style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">
-                Signals Detected</div>
+                Threats Found</div>
               <div id="r-threatcount">—</div>
             </div>
           </div>
@@ -217,19 +74,19 @@
         <div class="tab-panel active" id="tab-scan">
           <div class="gauge-wrap mb-6">
             <div class="gauge">
-              <h4>JS Obfuscation Score</h4>
-              <div class="ring" id="gauge-obfuscation"></div>
-              <p class="muted" id="obfuscation-label">—</p>
+              <h4>Legitimacy Score</h4>
+              <div class="ring" id="gauge-legit"></div>
+              <p class="muted" id="legit-label">—</p>
             </div>
             <div class="gauge">
-              <h4>Third-Party Request Share</h4>
-              <div class="ring" id="gauge-thirdparty"></div>
-              <p class="muted">Third-party / unique domains</p>
+              <h4>AI Model Confidence</h4>
+              <div class="ring" id="gauge-ai"></div>
+              <p class="muted">Verdict certainty</p>
             </div>
           </div>
           <div class="panel">
             <div class="panel-head">
-              <h3>Detected Signals</h3>
+              <h3>Detected Threats</h3>
             </div>
             <div id="threat-list"></div>
           </div>
@@ -240,13 +97,13 @@
           <div class="grid grid-2">
             <div class="panel">
               <div class="panel-head">
-                <h3>Page &amp; TLS Info</h3>
+                <h3>Domain Intel</h3>
               </div>
               <div id="intel-list"></div>
             </div>
             <div class="panel">
               <div class="panel-head">
-                <h3>Security &amp; Redirects</h3>
+                <h3>Reputation</h3>
               </div>
               <div id="rep-list"></div>
             </div>
@@ -255,18 +112,12 @@
 
         <!-- Sandbox tab -->
         <div class="tab-panel" id="tab-sandbox">
-          <div class="panel mb-6">
-            <div class="panel-head">
-              <h3>Screenshot Capture</h3>
-            </div>
-            <div class="screenshot-grid" id="screenshot-grid"></div>
-          </div>
           <div class="grid grid-4 mb-6" id="sandbox-stats"></div>
           <div class="panel">
             <div class="panel-head">
               <h3>Behaviour Summary</h3>
             </div>
-            <div id="sandbox-notes"></div>
+            <div id="sandbox-notes" style="padding:22px"></div>
           </div>
         </div>
       </div>
@@ -281,23 +132,22 @@
     if (!report) report = generateReport("secure-login-paypa1.com/verify");
 
     const verdictBadge = { SAFE: "badge-ok", SUSPICIOUS: "badge-warn", MALICIOUS: "badge-danger" };
-    const verdict = computeVerdict(report);
-    const signals = computeThreatSignals(report);
+    const verdictColorVar = { SAFE: "--ok", SUSPICIOUS: "--warn", MALICIOUS: "--danger" };
 
     // header
     document.getElementById("r-host").textContent = report.host;
-    document.getElementById("r-url").textContent = report.scan.source_url;
-    document.getElementById("r-time").textContent = report.scan.scan_start_time;
-    document.getElementById("r-loadtime").textContent = report.page.page_load_time_ms + " ms";
-    document.getElementById("r-threatcount").textContent = signals.length;
+    document.getElementById("r-url").textContent = report.url;
+    document.getElementById("r-time").textContent = report.scannedAt;
+    document.getElementById("r-risk").textContent = report.riskScore + "/100";
+    document.getElementById("r-threatcount").textContent = report.detected.length;
     const vb = document.getElementById("r-verdict");
-    vb.textContent = verdict;
-    vb.classList.add(verdictBadge[verdict]);
+    vb.textContent = report.verdict;
+    vb.classList.add(verdictBadge[report.verdict]);
 
     // ---- gauges ----
-    function drawGauge(elId, value, max, colorVar, displayValue) {
+    function drawGauge(elId, value, max, colorVar) {
       const el = document.getElementById(elId);
-      const pct = Math.max(0, Math.min(1, value / max));
+      const pct = value / max;
       const R = 62, C = 2 * Math.PI * R;
       const color = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
       el.innerHTML = `
@@ -306,7 +156,7 @@
           <circle cx="75" cy="75" r="${R}" stroke="${color}" stroke-width="12" fill="none"
             stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" id="${elId}-arc"/>
         </svg>
-        <div class="val">${displayValue}</div>`;
+        <div class="val">${max === 100 ? value + "%" : value.toFixed(1) + "%"}</div>`;
       // animate
       requestAnimationFrame(() => {
         const arc = document.getElementById(elId + "-arc");
@@ -315,131 +165,73 @@
       });
     }
 
-    const jsObfuscationScore = report.phishing_signals.js_obfuscation_score;
-    const obfuscationColor = jsObfuscationScore <= 20 ? "--ok" : jsObfuscationScore <= 50 ? "--warn" : "--danger";
-    drawGauge("gauge-obfuscation", jsObfuscationScore, 100, obfuscationColor, jsObfuscationScore + "%");
-    document.getElementById("obfuscation-label").textContent =
-      jsObfuscationScore <= 20 ? "Minimal obfuscation" : jsObfuscationScore <= 50 ? "Some obfuscation" : "Heavily obfuscated";
+    const legitColor = report.legitimacy >= 70 ? "--ok" : report.legitimacy >= 45 ? "--warn" : "--danger";
+    drawGauge("gauge-legit", report.legitimacy, 100, legitColor);
+    drawGauge("gauge-ai", report.aiConfidence, 100, "--accent");
+    document.getElementById("legit-label").textContent =
+      report.legitimacy >= 70 ? "Looks legitimate" : report.legitimacy >= 45 ? "Proceed with caution" : "Likely malicious";
 
-    const uniqueDomains = report.network_activity.unique_requested_domains || 1;
-    const thirdPartyShare = Math.round((report.network_activity.third_party_domain_count / uniqueDomains) * 100);
-    drawGauge("gauge-thirdparty", thirdPartyShare, 100, "--accent", thirdPartyShare + "%");
-
-    // detected signals
-    document.getElementById("threat-list").innerHTML = signals.length
-      ? signals
+    // threats
+    document.getElementById("threat-list").innerHTML = report.detected.length
+      ? report.detected
         .map((t) => `<div class="alert-row"><span class="dot dot-danger"></span><span class="url">${t}</span><span class="time">detected</span></div>`)
         .join("")
       : '<div class="alert-row"><span class="dot dot-ok"></span><span class="url">No threats detected</span></div>';
 
+    // intel
+    const i = report.intel;
+    document.getElementById("intel-list").innerHTML = `
+  ${row("Domain name", i.domain)}
+  ${row("Domain age", i.age)}
+  ${row("Confidence score", i.confidence)}
+  ${row("IP address", i.ip)}
+  ${row("Threat count", i.threat)}
+  ${row("Expiration duration", i.expiration)}`;
+
+    document.getElementById("rep-list").innerHTML = `
+  ${row("Brand Similarity", i.brandSimilarity)}
+  ${row("Fake Characters", i.fakeCharacters)}
+  ${row("URL Shortener Used", i.urlShortener)}
+  ${row("Host Reputation", i.reputation)}`;
+
     function row(k, v) {
       return `<div class="alert-row"><span class="muted">${k}</span><span class="time" style="color:var(--text)">${v}</span></div>`;
     }
-    function rowPill(k, label, isDanger) {
-      return `<div class="alert-row"><span class="muted">${k}</span><span class="status-pill ${isDanger ? "status-danger" : "status-safe"}">${label}</span></div>`;
-    }
+    function row(k, v) {
+  const safeValues = ["Safe", "No", "Not Detected"];
+  const dangerValues = ["Unsafe", "Yes", "Detected"];
 
-    // ---- Page & TLS info ----
-    const p = report.page;
-    const tls = report.tls_connection;
-    document.getElementById("intel-list").innerHTML = `
-      ${row("Page title", p.page_title)}
-      ${row("Final URL", p.final_url)}
-      ${row("Page language", p.page_language)}
-      ${row("DOM element count", p.dom_element_count)}
-      ${rowPill("Certificate present", tls.certificate_present ? "Yes" : "No", !tls.certificate_present)}
-      ${row("Certificate issuer", tls.certificate_issuer ?? "—")}
-      ${row("TLS version", tls.tls_version ?? "—")}
-      ${row("Certificate issued", tls.certificate_issued_date ?? "—")}`;
+  let value;
 
-    // ---- Security & redirects ----
-    const ps = report.phishing_signals;
-    const redirectRows = report.redirects.length
-      ? report.redirects.map((r) => row(`Redirect (${r.http_status_code})`, r.redirect_url)).join("")
-      : row("Redirects", "None");
-    document.getElementById("rep-list").innerHTML = `
-      ${row("Security headers present", report.security_headers.security_headers_present)}
-      ${rowPill("Brand impersonation match", ps.brand_impersonation_match ? `${ps.brand_impersonation_match.brand} (${Math.round(ps.brand_impersonation_match.similarity * 100)}%)` : "Not detected", !!ps.brand_impersonation_match)}
-      ${rowPill("QR code detected", ps.qr_code_detected ? "Detected" : "Not detected", ps.qr_code_detected)}
-      ${rowPill("Cloaking detected", ps.cloaking_detected ? "Detected" : "Not detected", ps.cloaking_detected)}
-      ${redirectRows}`;
+  if (safeValues.includes(v)) {
+    value = `<span class="status-pill status-safe">${v}</span>`;
+  } else if (dangerValues.includes(v)) {
+    value = `<span class="status-pill status-danger">${v}</span>`;
+  } else {
+    value = `<span class="time" style="color:var(--text)">${v}</span>`;
+  }
 
-    // ---- Screenshot capture ----
-    const shots = report.screenshots;
-    const screenshotCard = (label, src) => `
-      <div class="screenshot-card">
-        <div class="screenshot-frame">
-          <img src="${src}" alt="${label}" loading="lazy"
-            onerror="this.closest('.screenshot-card').classList.add('screenshot-missing')" />
-        </div>
-        <div class="screenshot-caption">${label}</div>
-      </div>`;
-    document.getElementById("screenshot-grid").innerHTML =
-      screenshotCard("Homepage Capture", shots.homepage_screenshot_path) +
-      screenshotCard("Full Page Capture", shots.fullpage_screenshot_path);
+  return `
+    <div class="alert-row">
+      <span class="muted">${k}</span>
+      ${value}
+    </div>
+  `;
+}
 
-    // ---- Sandbox stats ----
-    const net = report.network_activity;
-    const be = report.browser_events;
+    // sandbox
+    const s = report.sandbox;
     const stats = [
-      ["Total Requests", net.total_request_count],
-      ["Third-Party Domains", net.third_party_domain_count],
-      ["Popups", be.popup_count],
-      ["Downloads", report.downloads.length],
+      ["Network Requests", s.requests], ["Cookies Set", s.cookies],
+      ["Redirects", s.redirects], ["File Downloads", s.downloads],
     ];
     document.getElementById("sandbox-stats").innerHTML = stats
       .map(([k, v]) => `<div class="stat-card"><span class="k">${k}</span><div class="v">${v}</div></div>`)
       .join("");
-
-    // ---- Behaviour summary ----
-    const fm = report.form_metrics;
-    const dom = report.dom_content;
-    const permissionRequests = be.permission_requests.length ? be.permission_requests.join(", ") : "None";
-
-    // 3-tier severity: value >= dangerAt -> danger, >= warnAt -> warn, else ok.
-    // Deliberately graded (not just binary red/white) so the table reads the
-    // way a real behaviour-scoring table does.
-    function sev(value, warnAt, dangerAt) {
-      if (value >= dangerAt) return "val-danger";
-      if (value >= warnAt) return "val-warn";
-      return "val-ok";
-    }
-    function bRow(label, value, cls) {
-      return `<tr><td>${label}</td><td class="${cls}">${value}</td><td></td></tr>`;
-    }
-
-    let behaviourRows = "";
-    behaviourRows += bRow("XHR Requests", net.xhr_request_count, sev(net.xhr_request_count, 15, 30));
-    behaviourRows += bRow("WebSocket Connections", net.websocket_connection_count, sev(net.websocket_connection_count, 1, 2));
-    behaviourRows += bRow("Fingerprinting API Calls", net.fingerprinting_api_count, sev(net.fingerprinting_api_count, 1, 3));
-    behaviourRows += bRow("New Tabs Opened", be.new_tab_count, sev(be.new_tab_count, 1, 2));
-    behaviourRows += bRow("Clipboard Read Attempts", be.clipboard_read_attempts, sev(be.clipboard_read_attempts, 1, 2));
-    behaviourRows += bRow("Clipboard Write Attempts", be.clipboard_write_attempts, sev(be.clipboard_write_attempts, 1, 2));
-    behaviourRows += bRow("Permission Requests", permissionRequests, be.permission_requests.length ? "val-warn" : "val-ok");
-    behaviourRows += bRow("Password Fields", fm.password_field_count, sev(fm.password_field_count, 1, 2));
-    behaviourRows += bRow("Email Fields", fm.email_field_count, sev(fm.email_field_count, 1, 2));
-    behaviourRows += bRow("Cross-Domain Forms", fm.cross_domain_form_count, sev(fm.cross_domain_form_count, 1, 1));
-    behaviourRows += bRow("Hidden iFrames", dom.hidden_iframe_count, sev(dom.hidden_iframe_count, 1, 2));
-    behaviourRows += bRow("External Scripts", dom.external_script_count, sev(dom.external_script_count, 6, 13));
-    behaviourRows += bRow("Base64-Encoded Scripts", ps.base64_encoded_script_count, sev(ps.base64_encoded_script_count, 1, 3));
-
-    behaviourRows += report.evasion_techniques.length
-      ? report.evasion_techniques
-        .map((t) => bRow(t.technique_name, t.evasion_technique_flags ? "Flagged" : "Clear", t.evasion_technique_flags ? "val-danger" : "val-ok"))
-        .join("")
-      : bRow("Evasion Techniques", "None checked", "val-ok");
-
-    behaviourRows += report.downloads.length
-      ? report.downloads.map((d) => bRow(d.file_name, (d.file_size / 1024).toFixed(1) + " KB", sev(report.downloads.length, 1, 2))).join("")
-      : bRow("File Downloads", "None", "val-ok");
-
-    behaviourRows += bRow("Sandbox Verdict", verdict, verdict === "SAFE" ? "val-ok" : verdict === "SUSPICIOUS" ? "val-warn" : "val-danger");
-
     document.getElementById("sandbox-notes").innerHTML = `
-      <table class="behaviour-table">
-        <thead><tr><th>Signal</th><th>Value</th><th></th></tr></thead>
-        <tbody>${behaviourRows}</tbody>
-      </table>`;
+      ${row("Obfuscated JavaScript", s.obfuscatedJs)}
+      ${row("Credential forms", s.forms)}
+      ${row("Sandbox verdict", s.verdict)}`;
 
     // tabs
     function showTab(id, btn) {
