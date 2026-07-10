@@ -136,3 +136,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   hydrateIcons();
 });
+
+// slider for tabs new effect
+
+const slider = document.querySelector(".tab-slider");
+
+function moveSlider(btn){
+
+    slider.style.width = btn.offsetWidth + "px";
+
+    slider.style.transform =
+        `translateX(${btn.offsetLeft}px)`;
+
+}
+
+window.addEventListener("load",()=>{
+
+    moveSlider(document.querySelector(".tab.active"));
+
+});
+
+window.addEventListener("resize",()=>{
+
+    moveSlider(document.querySelector(".tab.active"));
+
+});

@@ -483,18 +483,89 @@ html[data-theme="light"] .rib-item.active{
 }
 .gauge h4 { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
 
-/* tabs */
-.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; }
-.tab {
-  padding: 12px 22px; background: transparent; border: none; color: var(--muted);
-  font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.82rem;
-  border-bottom: 2px solid transparent; transition: all 0.15s;
+/* =========================
+   Tabs
+========================= */
+
+.tabs {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin: 30px auto;
+    padding-left: 6px;
+    padding-right: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+
+    background:var(--panel);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 999px;
+    overflow: hidden;
 }
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-panel { display: none; animation: fade 0.3s ease; }
-.tab-panel.active { display: block; }
-@keyframes fade { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+.tab-slider {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 0;
+  height: calc(100% - 12px);
+  background: #64a5ef;
+  border-radius: 999px;
+  transition: width .28s ease, transform .28s ease;
+  z-index: 1;
+}
+
+.tab {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 175px;
+  height: 46px;
+  padding: 5 24px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: #000000;
+}
+
+.tab-panel {
+  display: none;
+  animation: fade .25s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* auth */
 .auth-wrap { min-height: 100vh; display: grid; place-items: center; padding: 40px 20px; position: relative; overflow: hidden; }

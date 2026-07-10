@@ -64,10 +64,23 @@
         </div>
 
         <!-- Tabs -->
-        <div class="tabs">
-          <button class="tab active" onclick="showTab('scan', this)">Scan</button>
-          <button class="tab" onclick="showTab('intel', this)">Cyber Intel</button>
-          <button class="tab" onclick="showTab('sandbox', this)">Sandbox</button>
+        <!-- Tabs -->
+        <div class="tabs" id="tabs">
+
+          <div class="tab-slider"></div>
+
+          <button class="tab active" onclick="showTab('scan', this)">
+            Scan
+          </button>
+
+          <button class="tab" onclick="showTab('intel', this)">
+            Cyber Intel
+          </button>
+
+          <button class="tab" onclick="showTab('sandbox', this)">
+            Sandbox
+          </button>
+
         </div>
 
         <!-- Scan tab -->
@@ -198,26 +211,26 @@
       return `<div class="alert-row"><span class="muted">${k}</span><span class="time" style="color:var(--text)">${v}</span></div>`;
     }
     function row(k, v) {
-  const safeValues = ["Safe", "No", "Not Detected"];
-  const dangerValues = ["Unsafe", "Yes", "Detected"];
+      const safeValues = ["Safe", "No", "Not Detected"];
+      const dangerValues = ["Unsafe", "Yes", "Detected"];
 
-  let value;
+      let value;
 
-  if (safeValues.includes(v)) {
-    value = `<span class="status-pill status-safe">${v}</span>`;
-  } else if (dangerValues.includes(v)) {
-    value = `<span class="status-pill status-danger">${v}</span>`;
-  } else {
-    value = `<span class="time" style="color:var(--text)">${v}</span>`;
-  }
+      if (safeValues.includes(v)) {
+        value = `<span class="status-pill status-safe">${v}</span>`;
+      } else if (dangerValues.includes(v)) {
+        value = `<span class="status-pill status-danger">${v}</span>`;
+      } else {
+        value = `<span class="time" style="color:var(--text)">${v}</span>`;
+      }
 
-  return `
+      return `
     <div class="alert-row">
       <span class="muted">${k}</span>
       ${value}
     </div>
   `;
-}
+    }
 
     // sandbox
     const s = report.sandbox;
@@ -234,12 +247,18 @@
       ${row("Sandbox verdict", s.verdict)}`;
 
     // tabs
-    function showTab(id, btn) {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById("tab-" + id).classList.add("active");
-    }
+    function showTab(tabName, button){
+    document.querySelectorAll(".tab").forEach(tab=>{
+        tab.classList.remove("active");
+    });
+    button.classList.add("active");
+    moveSlider(button);
+
+    document.querySelectorAll(".tab-panel").forEach(panel=>{
+        panel.classList.remove("active");
+    });
+   document.getElementById("tab-" + tabName).classList.add("active");
+}
 
     function flagIt() {
       const btn = document.getElementById("flag-btn");
