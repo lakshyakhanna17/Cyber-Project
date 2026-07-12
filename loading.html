@@ -12,41 +12,33 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body data-page="loading">
- <div class="loading-wrap">
-    <canvas id="web-canvas"></canvas>
 
-    <div class="loading-progress-track">
-    <div class="loading-progress-fill" id="progress"></div>
+<div class="loading-wrap">
+    <canvas id="radar-canvas"></canvas>
 </div>
 
-  <script src="js/common.js"></script>
-  <script src="js/mock.js"></script>
-  <script src="js/spiderweb.js"></script>
-  <script>
-    initSpiderWeb(document.getElementById("web-canvas"));
+<script src="js/radar.js"></script>
+<script>
 
-    const progress = document.getElementById("progress");
-let pct = 0;
+initRadar(document.getElementById("radar-canvas"));
+
+let p = 0;
 
 const timer = setInterval(() => {
 
-    pct += Math.random() * 12 + 6;
+    p += Math.random() * 12 + 5;
 
-    if (pct > 100)
-        pct = 100;
+    if (p >= 100) {
 
-    progress.style.width = pct + "%";
-
-    if (pct >= 100) {
         clearInterval(timer);
 
-        setTimeout(() => {
-            window.location.href = "report.html";
-        }, 500);
+        window.location.href = "report.html";
+
     }
 
-}, 550);
+}, 500);
 
-  </script>
+</script>
+
 </body>
 </html>
