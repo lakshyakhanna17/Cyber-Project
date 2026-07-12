@@ -142,12 +142,14 @@ document.addEventListener("DOMContentLoaded", () => {
 const slider = document.querySelector(".tab-slider");
 
 function moveSlider(btn){
+    if (!slider || !btn) return;
+    const container = btn.closest(".tabs");
+    const containerRect = container.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const offset = btnRect.left - containerRect.left - parseFloat(getComputedStyle(container).paddingLeft);
 
-    slider.style.width = btn.offsetWidth + "px";
-
-    slider.style.transform =
-        `translateX(${btn.offsetLeft}px)`;
-
+    slider.style.width = btnRect.width + "px";
+    slider.style.transform = `translateX(${offset}px)`;
 }
 
 window.addEventListener("load",()=>{
