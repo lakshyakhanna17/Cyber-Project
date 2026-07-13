@@ -97,7 +97,10 @@ function renderTopbar(active) {
     ${links.map((l) => `<a href="${l.href}" class="${l.id === active ? "active" : ""}">${l.label}</a>`).join("")}
     <a href="auth.html">Login</a>
   </nav>
-  <button class="menu-pill" onclick="toggleDrawer(true)">Menu <span class="bars"><span></span><span></span></span></button>
+  <div class="top-right-actions">
+    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" data-icon="theme"></button>
+    <button class="menu-pill" onclick="toggleDrawer(true)">Menu <span class="bars"><span></span><span></span></span></button>
+  </div>
   `;
 }
 
@@ -113,7 +116,7 @@ function renderDrawer(active) {
   <div class="drawer-panel">
     <button class="drawer-close" onclick="toggleDrawer(false)" aria-label="Close">&times;</button>
     ${links.map((l) => `<a href="${l.href}" onclick="toggleDrawer(false)">${l.label}</a>`).join("")}
-    <button class="btn mt-6" onclick="toggleTheme()">Toggle Theme</button>
+
   </div>`;
 }
 

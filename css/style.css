@@ -228,6 +228,8 @@ html[data-theme="light"] .topbar { background: rgba(244, 246, 241, 0.7); }
 }
 .top-links a:hover, .top-links a.active { color: var(--text); }
 
+.top-right-actions { display: flex; align-items: center; gap: 12px; }
+
 /* ---------- Hero ---------- */
 .hero {
   position: relative;
