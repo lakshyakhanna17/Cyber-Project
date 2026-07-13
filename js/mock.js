@@ -202,3 +202,253 @@ function loadLastReport() {
     return r ? JSON.parse(r) : null;
   } catch (e) { return null; }
 }
+
+/* ============================================================
+   Email tab — mock data engine.
+   Every field name below matches a column name from the SQL
+   schema exactly (snake_case, 1:1). Grouping keys (recipients,
+   authentication, received_chain, etc.) correspond to the source
+   table. No fields are invented beyond what the schema defines.
+
+   Corrections applied vs. the schema as originally pasted:
+     - emails: removed trailing comma after created_at (syntax error)
+     - email_authentication: added missing comma before alignment_status (syntax error)
+     - attachment_count.attavhment_count -> attachment_count (typo)
+
+   Note: message_user_map.user_id is carried through as a raw UUID.
+   No `users` table was provided in the schema, so it cannot be
+   resolved to a name/email here.
+
+   Relies on rand(), pick(), uid(), SAMPLE_DOMAINS, SAFE_DOMAINS,
+   THREAT_TYPES already defined globally by js/mock.js — load that
+   file before this one.
+   ============================================================ */
+
+function mockUUID() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function mockSha256() {
+  let out = "";
+  for (let i = 0; i < 64; i++) out += "0123456789abcdef"[rand(0, 15)];
+  return out;
+}
+
+const EMAIL_SUBJECTS_UNSAFE = [
+  "Your account has been suspended",
+  "Action required: verify your identity",
+  "Invoice #48213 — payment overdue",
+  "Unusual sign-in activity detected",
+  "Confirm your password reset",
+  "Your package could not be delivered",
+];
+const EMAIL_SUBJECTS_SAFE = [
+  "Your weekly summary is ready",
+  "Receipt for your recent order",
+  "Meeting notes from today",
+  "Welcome to the team",
+  "Your subscription was renewed",
+];
+const FROM_LOCAL_PARTS = ["billing", "support", "security", "no-reply", "accounts", "admin", "alerts"];
+const DISPLAY_NAMES = ["Billing Team", "Account Security", "Support Desk", "IT Administrator", "No Reply", "Customer Care"];
+const RECIPIENT_DOMAINS = ["corp-mail.com", "example.org", "myinbox.com"];
+const HEADER_SAMPLES = ["MIME-Version", "Content-Type", "X-Mailer", "X-Originating-IP", "Message-ID", "Auto-Submitted"];
+const MIME_TYPES = ["application/pdf", "application/zip", "image/png", "application/vnd.ms-excel", "application/octet-stream"];
+const FILE_EXTENSIONS = { "application/pdf": "pdf", "application/zip": "zip", "image/png": "png", "application/vnd.ms-excel": "xls", "application/octet-stream": "exe" };
+const COUNTRIES = ["United States", "Netherlands", "Russia", "Germany", "Nigeria", "Vietnam", "Romania"];
+
+function generateEmailRecord() {
+  const isSafe = Math.random() > 0.55;
+  const domain = isSafe ? pick(SAFE_DOMAINS) : pick(SAMPLE_DOMAINS);
+  const message_id = mockUUID();
+  const from_address = `${pick(FROM_LOCAL_PARTS)}@${domain}`;
+  const sentDate = new Date(Date.now() - rand(0, 30) * 86400000 - rand(0, 86399) * 1000);
+  const spoofed = !isSafe && Math.random() > 0.45;
+  const returnPathDomain = spoofed ? pick(SAMPLE_DOMAINS) : domain;
+
+  // ---- recipients ----
+  const recipientTypes = ["TO", ...(Math.random() > 0.5 ? ["CC"] : []), ...(Math.random() > 0.75 ? ["BCC"] : [])];
+  const recipients = recipientTypes.map((recipient_type) => ({
+    message_id,
+    recipient_type,
+    recipient_address: `${pick(["alice", "bob", "priya", "devon", "team"])}@${pick(RECIPIENT_DOMAINS)}`,
+  }));
+
+  // ---- email_reply_to ----
+  const reply_to_domain = spoofed ? pick(SAMPLE_DOMAINS) : domain;
+  const reply_to = {
+    message_id,
+    reply_to: `${pick(FROM_LOCAL_PARTS)}@${reply_to_domain}`,
+    reply_to_domain,
+  };
+
+  // ---- email_authentication ----
+  const spf_result = isSafe ? "pass" : pick(["fail", "none", "neutral"]);
+  const dkim_result = isSafe ? "pass" : pick(["fail", "none"]);
+  const dmarc_result = isSafe ? "pass" : pick(["fail", "none"]);
+  const authentication = {
+    auth_id: mockUUID(),
+    message_id,
+    spf_result,
+    spf_domain: domain,
+    dkim_result,
+    dkim_domain: domain,
+    dkim_selector: pick(["default", "google", "selector1", "s1"]),
+    dmarc_result,
+    dmarc_policy: pick(["none", "quarantine", "reject"]),
+    overall_auth_result: isSafe ? "pass" : pick(["fail", "partial", "neutral", "none"]),
+    alignment_status: isSafe ? "aligned" : pick(["misaligned", "partial", "unknown"]),
+  };
+
+  // ---- message_user_map ----
+  const user_map = { user_id: mockUUID(), message_id };
+
+  // ---- received_chain / received_hops ----
+  const hopCount = rand(2, 5);
+  const received_hops = Array.from({ length: hopCount }, (_, idx) => {
+    const hop_number = idx + 1;
+    return {
+      message_id,
+      hop_number,
+      received_from: `mail-relay-${hop_number}.${pick(SAMPLE_DOMAINS.concat(SAFE_DOMAINS))}`,
+      received_by: `mx${hop_number}.${domain}`,
+      received_with: pick(["ESMTP", "ESMTPS", "SMTP"]),
+      received_id: mockUUID(),
+      received_for: from_address,
+      received_timestamp: new Date(sentDate.getTime() - (hopCount - hop_number) * 60000).toISOString(),
+    };
+  });
+  const received_chain = {
+    message_id,
+    hop_number: hopCount,
+    received_count: hopCount,
+    originating_ip: `${rand(11, 220)}.${rand(0, 255)}.${rand(0, 255)}.${rand(1, 254)}`,
+    sender_hostname: `mail.${domain}`,
+    sender_country: isSafe ? pick(["United States", "Germany", "Netherlands"]) : pick(COUNTRIES),
+    sender_asn: rand(1000, 65000),
+    reverse_dns: Math.random() > 0.3 ? `mail.${domain}` : null,
+  };
+
+  // ---- email_headers ----
+  const headers = HEADER_SAMPLES.map((header_name) => ({
+    message_id,
+    header_name,
+    header_value:
+      header_name === "Message-ID" ? `<${uid()}@${domain}>` :
+      header_name === "Content-Type" ? "multipart/mixed; boundary=\"----=_Part\"" :
+      header_name === "MIME-Version" ? "1.0" :
+      header_name === "X-Originating-IP" ? `[${rand(11,220)}.${rand(0,255)}.${rand(0,255)}.${rand(1,254)}]` :
+      header_name === "X-Mailer" ? pick(["Outlook 16.0", "PHPMailer 6.8", "Postfix", "Sendmail 8.15"]) :
+      "no",
+  }));
+
+  // ---- email_domains ----
+  const domains_info = {
+    message_id,
+    sender_domain: domain,
+    return_path_domain: returnPathDomain,
+    message_id_domain: domain,
+    dkim_domain: domain,
+  };
+
+  // ---- domains (master) ----
+  const domain_master = {
+    email_domain_name: domain,
+    dnssec_enabled: isSafe ? true : Math.random() > 0.7,
+    mx_records: `10 mx1.${domain}; 20 mx2.${domain}`,
+  };
+
+  // ---- impersonation ----
+  const impersonation = {
+    message_id,
+    typo_squatting: spoofed && Math.random() > 0.4,
+    display_name_spoof: spoofed && Math.random() > 0.5,
+    spoofing_detected: spoofed,
+  };
+
+  // ---- attachments / attachment_count ----
+  const attachmentN = isSafe ? rand(0, 1) : rand(0, 3);
+  const attachments = Array.from({ length: attachmentN }, () => {
+    const mime_type = pick(MIME_TYPES);
+    const file_extension = FILE_EXTENSIONS[mime_type];
+    const malware_detected = !isSafe && Math.random() > 0.6;
+    return {
+      attachment_id: mockUUID(),
+      message_id,
+      attachment_name: `${pick(["invoice", "statement", "document", "update", "attachment"])}.${file_extension}`,
+      attachment_size: rand(4000, 4500000),
+      file_extension,
+      mime_type,
+      sha256_hash: mockSha256(),
+      malware_detected,
+      macro_present: file_extension === "xls" ? Math.random() > 0.5 : false,
+      content_disposition: "attachment",
+      is_inline: false,
+      attachment_password_protected: Math.random() > 0.85,
+    };
+  });
+  const attachment_count = { message_id, attachment_count: attachments.length };
+
+  // ---- email_content ----
+  const content = {
+    message_id,
+    body_text: isSafe
+      ? "Hi, please find the requested information attached. Let us know if you have any questions."
+      : "Your account requires immediate verification. Click the link below to confirm your details or your access will be suspended.",
+    html_body: null,
+    language: pick(["en", "en-US", "en-GB", "es", "fr"]),
+    urgency_score: isSafe ? rand(2, 20) / 10 : rand(50, 98) / 10,
+    credential_theft_score: isSafe ? rand(0, 15) / 10 : rand(40, 95) / 10,
+    financial_score: isSafe ? rand(0, 10) / 10 : rand(20, 90) / 10,
+    spam_score: isSafe ? rand(0, 20) / 10 : rand(30, 99) / 10,
+    link_mentioned: !isSafe || Math.random() > 0.5,
+    homoglyph_in_subject_or_body: spoofed && Math.random() > 0.5,
+    embedded_tracking_pixel_count: isSafe ? 0 : rand(0, 3),
+  };
+
+  // ---- extracted_urls ----
+  const urlN = isSafe ? rand(0, 1) : rand(1, 4);
+  const extracted_urls = Array.from({ length: urlN }, (_, idx) => ({
+    message_id,
+    url_sequence: idx + 1,
+    extracted_url: `https://${pick(SAMPLE_DOMAINS)}/${pick(["verify", "login", "secure", "account", "confirm"])}`,
+  }));
+
+  return {
+    message_id,
+    from_address,
+    display_name: pick(DISPLAY_NAMES),
+    return_path: `bounce@${returnPathDomain}`,
+    subject: isSafe ? pick(EMAIL_SUBJECTS_SAFE) : pick(EMAIL_SUBJECTS_UNSAFE),
+    sent_at: sentDate.toLocaleString(),
+    thread_id: uid(),
+    recipient_count: recipients.length,
+    created_at: new Date(sentDate.getTime() + 2000).toLocaleString(),
+
+    recipients,
+    reply_to,
+    authentication,
+    user_map,
+    received_chain,
+    received_hops,
+    headers,
+    domains_info,
+    domain_master,
+    impersonation,
+    attachments,
+    attachment_count,
+    content,
+    extracted_urls,
+
+    _isSafe: isSafe, // UI-only convenience flag, not a schema field — used solely for list-view badge coloring
+  };
+}
+
+function generateEmailList(count) {
+  return Array.from({ length: count || 10 }, generateEmailRecord)
+    .sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
+}

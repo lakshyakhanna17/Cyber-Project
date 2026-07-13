@@ -24,6 +24,57 @@ function toggleDrawer(open) {
   else d.classList.toggle("open", open);
 }
 
+/* ---- Ribbon (sidebar) pin/expand toggle ----
+   .ribbon.expanded is already fully styled in style.css (width, labels) -
+   it was only ever reachable via :hover. This makes it a persistent,
+   click-to-pin state (touch devices have no hover). */
+function toggleRibbon() {
+  const r = document.getElementById("ribbon");
+  if (!r) return;
+  r.classList.toggle("expanded");
+}
+
+/* ---- Ribbon "Menu" dropdown ----
+   Appended to document.body (not nested in .ribbon) because .ribbon has
+   overflow:hidden for its width transition, which would silently clip
+   any dropdown rendered as its descendant. */
+function toggleRibMenu(e) {
+  const existing = document.getElementById("rib-menu-dropdown");
+  if (existing) { existing.remove(); return; }
+  if (!e) return;
+
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const pinned = document.getElementById("ribbon").classList.contains("expanded");
+
+  const dd = document.createElement("div");
+  dd.id = "rib-menu-dropdown";
+  dd.style.cssText = `
+    position:fixed; top:${rect.top}px; left:${rect.right + 10}px;
+    min-width:200px; background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:0 12px 32px rgba(0,0,0,0.4);
+    z-index:200; overflow:hidden; font-family:var(--font-body);
+  `;
+  dd.innerHTML = `
+    <button onclick="toggleRibbon(); toggleRibMenu();" style="display:block;width:100%;text-align:left;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:0.9rem;cursor:pointer">
+      ${pinned ? "Unpin sidebar" : "Pin sidebar open"}
+    </button>
+    <a href="auth.html" style="display:block;width:100%;text-align:left;padding:12px 16px;color:var(--text);font-size:0.9rem;text-decoration:none">
+      Login / Account
+    </a>
+  `;
+  document.body.appendChild(dd);
+
+  // Attached after this click finishes bubbling, so the same click that
+  // opened the menu doesn't immediately close it again.
+  setTimeout(() => document.addEventListener("click", closeRibMenuOnOutsideClick, { once: true }), 0);
+}
+
+function closeRibMenuOnOutsideClick(e) {
+  const dd = document.getElementById("rib-menu-dropdown");
+  if (dd && !dd.contains(e.target)) dd.remove();
+}
+
 /* ---- SVG icon library (inline, no deps) ---- */
 const ICONS = {
   logo: '<svg fill="#000000" width="800px" height="800px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"/></svg>',
@@ -46,6 +97,7 @@ const ICONS = {
   bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>',
   eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
   lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>',
 };
 
 function icon(name) { return ICONS[name] || ""; }
@@ -64,6 +116,7 @@ function renderRibbon(active) {
     { id: "dashboard", label: "Dashboard", href: "dashboard.html", icon: "dashboard" },
     { id: "scan", label: "New Scan", href: "scan.html", icon: "scan" },
     { id: "report", label: "Reports", href: "report.html", icon: "report" },
+    { id: "email", label: "Email", href: "emails.html", icon: "email" },
   ];
   const links = items
     .map(
@@ -72,7 +125,7 @@ function renderRibbon(active) {
     )
     .join("");
   return `
-    <button class="rib-item" onclick="toggleRibbon()" title="Menu" style="margin-bottom:6px">${icon("menu")}<span class="label">Menu</span></button>
+    <button class="rib-item" onclick="toggleRibMenu(event)" title="Menu" style="margin-bottom:6px">${icon("menu")}<span class="label">Menu</span></button>
     <a class="rib-logo" href="index.html" title="Home">${icon("logo")}</a>
     ${links}
     <div class="rib-spacer"></div>
