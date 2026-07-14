@@ -10,6 +10,10 @@ const EX_COLORS = {
 };
 
 function getExTheme() {
+  const toggle = document.getElementById("export-theme-toggle");
+  if (toggle) {
+    return toggle.checked ? EX_COLORS.dark : EX_COLORS.light;
+  }
   return document.documentElement.getAttribute("data-theme") === "light" ? EX_COLORS.light : EX_COLORS.dark;
 }
 
@@ -496,7 +500,38 @@ function updateExportPreview() {
   // Clear previous preview and insert new one
   inner.innerHTML = "";
   inner.appendChild(dom);
+  
+  adjustPreviewScale();
 }
+
+function adjustPreviewScale() {
+  const viewport = document.getElementById("export-preview-viewport");
+  const inner = document.getElementById("export-preview-inner");
+  if (!viewport || !inner || !inner.firstChild) return;
+
+  // Reset inner styles to let it flow naturally first
+  inner.style.transform = "none";
+  inner.style.width = "auto";
+  inner.style.height = "auto";
+
+  const availableWidth = viewport.clientWidth;
+  const scale = availableWidth / 760;
+
+  const child = inner.firstChild;
+  child.style.transformOrigin = "top left";
+  child.style.transform = `scale(${scale})`;
+
+  // Set the container size so the scrollbar reflects the scaled height perfectly
+  inner.style.width = `${availableWidth}px`;
+  inner.style.height = `${child.offsetHeight * scale}px`;
+}
+
+// Re-adjust scale when window resizes
+window.addEventListener("resize", () => {
+  if (document.getElementById("export-overlay").classList.contains("open")) {
+    adjustPreviewScale();
+  }
+});
 
 function schedulePreviewUpdate() {
   clearTimeout(_previewDebounce);

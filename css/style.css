@@ -2492,12 +2492,8 @@ html[data-theme="light"] .export-preview-viewport {
   border: 1px solid var(--border);
 }
 
-/* The actual scaled-down preview content */
+/* The actual preview content wrapper */
 .export-preview-inner {
-  transform-origin: top left;
-  transform: scale(0.48);
-  width: 208.33%;
-  /* 100% / 0.48 */
   pointer-events: none;
 }
 
@@ -2577,3 +2573,57 @@ html[data-theme="light"] .export-preview-viewport {
     padding: 16px 20px;
   }
 }
+
+/* Export Theme Slider Toggle */
+.theme-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.theme-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--panel-2);
+  transition: .4s;
+  border: 1px solid var(--border);
+}
+
+.theme-toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text);
+  transition: .4s;
+}
+
+.theme-toggle input:checked + .slider {
+  background-color: var(--panel-2);
+}
+
+.theme-toggle input:checked + .slider:before {
+  transform: translateX(24px);
+  background-color: var(--text);
+}
+
+.theme-toggle .slider.round {
+  border-radius: 26px;
+}
+
+.theme-toggle .slider.round:before {
+  border-radius: 50%;
+}
