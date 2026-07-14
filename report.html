@@ -20,12 +20,14 @@
       gap: 18px;
       padding: 22px;
     }
+
     .screenshot-card {
       border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
       border-radius: 12px;
       overflow: hidden;
       background: var(--panel-2, #0d1220);
     }
+
     .screenshot-frame {
       position: relative;
       aspect-ratio: 16 / 10;
@@ -34,6 +36,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .screenshot-frame img {
       width: 100%;
       height: 100%;
@@ -41,6 +44,7 @@
       object-position: top;
       display: block;
     }
+
     .screenshot-frame::after {
       content: "Screenshot not available";
       display: none;
@@ -49,8 +53,15 @@
       text-align: center;
       padding: 0 16px;
     }
-    .screenshot-missing .screenshot-frame img { display: none; }
-    .screenshot-missing .screenshot-frame::after { display: block; }
+
+    .screenshot-missing .screenshot-frame img {
+      display: none;
+    }
+
+    .screenshot-missing .screenshot-frame::after {
+      display: block;
+    }
+
     .screenshot-caption {
       padding: 10px 14px;
       font-size: 0.72rem;
@@ -59,8 +70,11 @@
       color: var(--muted, #8b93ac);
       border-top: 1px solid var(--border, rgba(255, 255, 255, 0.12));
     }
+
     @media (max-width: 640px) {
-      .screenshot-grid { grid-template-columns: 1fr; }
+      .screenshot-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -75,7 +89,7 @@
           <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" data-icon="theme"></button>
           <button class="btn btn-sm" id="flag-btn" onclick="flagIt()"><span data-icon="flag"
               style="width:16px;height:16px;display:inline-flex"></span> Flag</button>
-          <button class="btn btn-primary btn-sm" onclick="window.print()"><span data-icon="download"
+          <button class="btn btn-primary btn-sm" onclick="openExportModal()"><span data-icon="download"
               style="width:16px;height:16px;display:inline-flex"></span> Generate PDF</button>
         </div>
       </div>
@@ -208,8 +222,136 @@
     </div>
   </div>
 
+  <!-- Export modal overlay -->
+  <div class="export-overlay" id="export-overlay">
+    <div class="export-modal">
+      <div class="export-header">
+        <h2>Export Report</h2>
+        <button class="export-close" onclick="closeExportModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="export-layout">
+
+        <!-- LEFT: Controls -->
+        <div class="export-controls">
+
+          <!-- Section: Include in report -->
+          <div>
+            <div class="export-section-label">Include in Report</div>
+            <div class="export-checkbox-group">
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-basics" checked />
+                <span>Basic Details</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-scan" checked />
+                <span>Scan Results</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-intel" checked />
+                <span>Cyber Intel</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-screenshots" checked />
+                <span>Sandbox Screenshots</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-pagetls" checked />
+                <span>Page &amp; TLS Info</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-security" checked />
+                <span>Security &amp; Redirects</span>
+              </label>
+              <label class="export-checkbox">
+                <input type="checkbox" id="ex-behaviour" checked />
+                <span>Stats &amp; Behaviour</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="export-divider"></div>
+
+          <!-- Section: Format -->
+          <div>
+            <div class="export-section-label">Export Format</div>
+            <div class="export-format-toggle">
+              <input type="radio" name="exportFmt" id="fmt-pdf" checked />
+              <label for="fmt-pdf" class="active" data-format="pdf" onclick="setExportFormat('pdf')">
+                <span class="format-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6" />
+                    <path d="M9 15h6" />
+                    <path d="M9 11h2" />
+                  </svg>
+                </span>
+                PDF Document
+              </label>
+              <input type="radio" name="exportFmt" id="fmt-jpg" />
+              <label for="fmt-jpg" data-format="jpg" onclick="setExportFormat('jpg')">
+                <span class="format-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="m21 15-5-5L5 21" />
+                  </svg>
+                </span>
+                JPG Image
+              </label>
+            </div>
+          </div>
+
+          <!-- Section: Page Size -->
+          <div id="export-size-group">
+            <div class="export-section-label">Page Size</div>
+            <select class="export-size-select" id="export-size">
+              <option value="a4" selected>A4 — 210 × 297 mm</option>
+              <option value="letter">Letter — 8.5 × 11 in</option>
+              <option value="a3">A3 — 297 × 420 mm</option>
+              <option value="fit">Fit to Content (single page)</option>
+            </select>
+          </div>
+
+          <div class="export-divider"></div>
+
+          <!-- Download button -->
+          <button class="export-download-btn" id="export-download-btn" onclick="startExport()">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </span>
+            <span class="btn-label">Download Report</span>
+          </button>
+
+          <p class="export-hint">Report is generated client-side. No data is uploaded.</p>
+
+        </div>
+
+        <!-- RIGHT: Always-visible preview -->
+        <div class="export-preview-pane">
+          <div class="export-section-label">Live Preview</div>
+          <div class="export-preview-viewport" id="export-preview-viewport">
+            <span class="export-preview-badge">Preview</span>
+            <div class="export-preview-inner" id="export-preview-inner"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN libs for export -->
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/common.js"></script>
   <script src="js/mock.js"></script>
+  <script src="js/export.js"></script>
   <script>
     // load report or synthesize a demo one
     let report = loadLastReport();
@@ -391,18 +533,18 @@
     document.getElementById("sandbox-notes").innerHTML = notesHtml;
 
     // tabs
-    function showTab(tabName, button){
-    document.querySelectorAll(".tab").forEach(tab=>{
+    function showTab(tabName, button) {
+      document.querySelectorAll(".tab").forEach(tab => {
         tab.classList.remove("active");
-    });
-    button.classList.add("active");
-    moveSlider(button);
+      });
+      button.classList.add("active");
+      moveSlider(button);
 
-    document.querySelectorAll(".tab-panel").forEach(panel=>{
+      document.querySelectorAll(".tab-panel").forEach(panel => {
         panel.classList.remove("active");
-    });
-   document.getElementById("tab-" + tabName).classList.add("active");
-}
+      });
+      document.getElementById("tab-" + tabName).classList.add("active");
+    }
 
     function flagIt() {
       const btn = document.getElementById("flag-btn");
