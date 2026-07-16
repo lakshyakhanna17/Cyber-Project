@@ -252,11 +252,27 @@ function buildReportDom(report, sections) {
     wrap.appendChild(s);
   }
 
-  /* ======= SANDBOX PAGE & TLS INFO ======= */
-  if (sections.pageTls) {
-    const s = sec("Sandbox — Page & TLS Info");
-    const sb = report.sandbox;
-    [["Page Title", sb.pageTitle], ["Final URL", sb.finalUrl], ["Language", sb.pageLanguage], ["DOM Elements", sb.domElementCount], ["Certificate", sb.certificatePresent ? "Present" : "Missing", sb.certificatePresent ? false : true], ["Certificate Issuer", sb.certificateIssuer ?? "—"], ["TLS Version", sb.tlsVersion ?? "—"], ["Certificate Issued", sb.certificateIssued ?? "—"]].forEach(([k, v, f]) => s.appendChild(kvRow(k, v, f)));
+  /* ======= AI INSIGHTS ======= */
+  if (sections.aiInsights && report.aiInsights) {
+    const s = sec("AI Insights");
+    const ai = report.aiInsights;
+
+    s.appendChild(kvRow("Analysis Status", ai.core?.status || "Completed"));
+    s.appendChild(kvRow("Global Risk Score", (ai.core?.globalRisk || 0) + "/100", (ai.core?.globalRisk || 0) >= 75));
+    s.appendChild(kvRow("Visual Clone Verdict", ai.visual?.verdict || "—", ai.visual?.isClone));
+    s.appendChild(kvRow("Model Confidence", (ai.visual?.confidence || 0) + "%"));
+
+    if (ai.brand && ai.brand.target !== "None Detected") {
+      s.appendChild(kvRow("Impersonation Target", ai.brand.target, true));
+      s.appendChild(kvRow("Impersonation Confidence", (ai.brand.confidence || 0) + "%"));
+    }
+
+    if (ai.policy && ai.policy.length) {
+      ai.policy.forEach((p) => {
+        s.appendChild(kvRow("Policy Violation: " + p.name, p.value + " (Limit: " + p.limit + ")", true));
+      });
+    }
+
     wrap.appendChild(s);
   }
 
@@ -338,7 +354,7 @@ function getSelectedSections() {
     scan: document.getElementById("ex-scan").checked,
     intel: document.getElementById("ex-intel").checked,
     screenshots: document.getElementById("ex-screenshots").checked,
-    pageTls: document.getElementById("ex-pagetls").checked,
+    aiInsights: document.getElementById("ex-aiinsights") ? document.getElementById("ex-aiinsights").checked : false,
     security: document.getElementById("ex-security").checked,
     behaviour: document.getElementById("ex-behaviour").checked,
   };
@@ -500,7 +516,7 @@ function updateExportPreview() {
   // Clear previous preview and insert new one
   inner.innerHTML = "";
   inner.appendChild(dom);
-  
+
   adjustPreviewScale();
 }
 
@@ -540,7 +556,7 @@ function schedulePreviewUpdate() {
 
 /* Attach checkbox listeners for live preview refresh */
 document.addEventListener("DOMContentLoaded", () => {
-  const checkboxIds = ["ex-basics", "ex-scan", "ex-intel", "ex-screenshots", "ex-pagetls", "ex-security", "ex-behaviour"];
+  const checkboxIds = ["ex-basics", "ex-scan", "ex-intel", "ex-screenshots", "ex-aiinsights", "ex-security", "ex-behaviour"];
   checkboxIds.forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("change", schedulePreviewUpdate);
