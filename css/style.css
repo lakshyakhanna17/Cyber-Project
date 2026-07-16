@@ -833,7 +833,7 @@ html[data-theme="light"] .rib-item.active {
   top: 0;
   background: var(--bg);
   backdrop-filter: blur(12px);
-  z-index: 20;
+  z-index: 30;
 }
 
 .appbar h1 {

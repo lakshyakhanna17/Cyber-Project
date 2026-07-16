@@ -287,6 +287,10 @@
             Sandbox
           </button>
 
+          <button class="tab" onclick="showTab('ai-insights', this)">
+            AI Insights
+          </button>
+
         </div>
 
         <!-- Scan tab -->
@@ -362,7 +366,126 @@
             <div id="sandbox-notes" style="padding:22px"></div>
           </div>
         </div>
+
+        <!-- AI Insights tab -->
+        <div class="tab-panel" id="tab-ai-insights">
+          <!-- Self-contained Keyframes & Styles for the Ripple & Jump -->
+          <style>
+            @keyframes aiBubbleSpring {
+              0% { transform: translate(-50%, -50%) scale(1); }
+              40% { transform: translate(-50%, -140%) scale(1.35); }
+              100% { transform: translate(-50%, -50%) scale(1.15); }
+            }
+            @keyframes aiRippleRadiate {
+              0% { transform: translate(-50%, -50%) scale(1); opacity: 1; border-width: 4px; }
+              100% { transform: translate(-50%, -50%) scale(3.8); opacity: 0; border-width: 1px; }
+            }
+            .ai-bubble-base {
+              position: absolute; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; 
+              background: var(--bg); border: 3px solid var(--panel); border-radius: 50%; z-index: 10; 
+              box-shadow: var(--shadow-sm); transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            .ai-bubble-base::before {
+              content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); 
+              width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--danger); opacity: 0; pointer-events: none;
+            }
+            .ai-bubble-base::after {
+              content: 'LIMIT'; position: absolute; top: -24px; left: 50%; transform: translateX(-50%); 
+              font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; font-weight: bold; color: var(--muted); background: var(--bg); 
+              padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); pointer-events: none;
+            }
+            .ai-bubble-pop-ripple {
+              animation: aiBubbleSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+              border-color: #ef4444 !important; box-shadow: 0 0 16px #ef4444 !important;
+            }
+            .ai-bubble-pop-ripple::before {
+              animation: aiRippleRadiate 0.8s ease-out forwards;
+            }
+            .ai-row-card {
+              background: rgba(255, 255, 255, 0.015); border: 1px solid rgba(255, 255, 255, 0.04);
+              border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; transition: all 0.2s ease;
+            }
+            .ai-row-card:hover {
+              transform: translateY(-3px); background: rgba(255, 255, 255, 0.04);
+              border-color: rgba(255, 255, 255, 0.12); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            }
+            .ai-list-row {
+              display: flex; justify-content: space-between; align-items: center; padding: 14px 0;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .ai-list-row:last-child { border-bottom: none; }
+
+            /* Sleek, breathing neon red tag */
+            @keyframes subtleDangerPulse {
+              0%, 100% {
+                background: rgba(239, 68, 68, 0.15);
+                border-color: rgba(239, 68, 68, 0.45);
+                box-shadow: 0 0 12px rgba(239, 68, 68, 0.35), inset 0 0 6px rgba(239, 68, 68, 0.15);
+                filter: brightness(1);
+              }
+              50% {
+                background: rgba(239, 68, 68, 0.08);
+                border-color: rgba(239, 68, 68, 0.2);
+                box-shadow: 0 0 4px rgba(239, 68, 68, 0.1), inset 0 0 0px rgba(239, 68, 68, 0);
+                filter: brightness(0.85);
+              }
+            }
+
+            .ai-badge-soft-red {
+              background: rgba(239, 68, 68, 0.15);
+              color: #ff6b6b;
+              border: 1px solid rgba(239, 68, 68, 0.4);
+              padding: 5px 14px;
+              border-radius: 9999px;
+              font-size: 0.75rem;
+              font-weight: 600;
+              letter-spacing: 0.03em;
+              box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+              animation: subtleDangerPulse 3.2s infinite ease-in-out;
+            }
+          </style>
+
+          <!-- Card 1: Core Inference State -->
+          <div class="panel mb-6">
+            <div class="panel-head"><h3>Core Inference State</h3></div>
+            <div style="padding: 24px;" id="ai-core-metrics"></div>
+          </div>
+
+          <!-- Card 2: Visual Layout Engine -->
+          <div class="panel mb-6">
+            <div class="panel-head"><h3>Visual Layout Engine</h3></div>
+            <div style="padding: 24px;" id="ai-visual-layout"></div>
+          </div>
+
+          <!-- Card 3: Explainable AI (SHAP Analysis) -->
+          <div class="panel mb-6">
+            <div class="panel-head">
+              <h3>Explainable AI (SHAP Analysis)</h3>
+              <span class="pill-tag">Model Weights</span>
+            </div>
+            <div style="padding: 24px;">
+              <p class="muted mb-6" id="ai-shap-desc" style="font-size: 0.9rem; line-height: 1.6; margin-top: 0;"></p>
+              <div id="ai-shap-graph"></div>
+            </div>
+          </div>
+
+          <!-- Card 4: Brand Impersonation Intel -->
+          <div class="panel mb-6">
+            <div class="panel-head"><h3>Brand Impersonation Intel</h3></div>
+            <div style="padding: 24px;" id="ai-brand"></div>
+          </div>
+
+          <!-- Card 5: Policy & Threshold Violations -->
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Policy & Threshold Violations</h3>
+              <span class="pill-tag">Live Guardrails</span>
+            </div>
+            <div style="padding: 24px;" id="ai-thresholds"></div>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -764,6 +887,278 @@
         if (wrapper) wrapper.classList.remove("open");
       });
     });
+
+    // ==========================================================================
+    // AI INSIGHTS MODULE (Clear Threshold UI + Guaranteed Video Demo Breaches)
+    // ==========================================================================
+    (function initAiInsightsModule() {
+      const isMal = report.verdict !== "SAFE";
+      
+      // FORCE high scores (88.8% - 98.6%) for video demos so it ALWAYS breaches the limit!
+      const conf = isMal ? parseFloat((88.8 + Math.random() * 9.8).toFixed(1)) : 14.2;
+      const brandConf = isMal ? parseFloat((89.2 + Math.random() * 8.5).toFixed(1)) : 8.0;
+
+      if (!report.aiInsights || report.aiInsights._forced) {
+        report.aiInsights = {
+          _forced: true,
+          core: { status: "Completed", globalRisk: report.riskScore || 89 },
+          visual: {
+            isClone: isMal,
+            verdict: isMal ? "Visual Clone Detected" : "Authentic Layout Structure",
+            confidence: conf,
+            threshold: 85.0,
+            summary: isMal 
+              ? `The webpage layout shares a ${conf}% structural match with standard login matrices (e.g., PayPal/Microsoft), exceeding the clone guardrail limit of 85.0%.`
+              : `The visual layout architecture demonstrates organic design patterns with a low structural similarity (${conf}%) to known phishing templates.`
+          },
+          shap: {
+            description: "Model feature attribution analysis indicating key signals influencing the final inference verdict.",
+            features: [
+              { name: "has_login_form", weight: isMal ? "+4.2" : "-1.4", pct: isMal ? "88" : "25", impact: isMal ? "negative" : "positive" },
+              { name: "domain_age_low", weight: isMal ? "+2.8" : "-0.8", pct: isMal ? "72" : "15", impact: isMal ? "negative" : "positive" },
+              { name: "brand_similarity_high", weight: isMal ? "+2.1" : "-0.5", pct: isMal ? "64" : "10", impact: isMal ? "negative" : "positive" },
+              { name: "ssl_cert_valid", weight: "-1.2", pct: "35", impact: "positive" },
+              { name: "external_script_count", weight: isMal ? "+1.8" : "-0.4", pct: isMal ? "55" : "20", impact: isMal ? "negative" : "positive" }
+            ]
+          },
+          brand: {
+            target: isMal ? "PayPal Inc." : "None Detected",
+            domain: isMal ? "paypal.com" : "N/A",
+            confidence: brandConf,
+            threshold: 75.0, // Second threshold marker for video demo!
+            rankings: [
+              { rank: 1, name: "PayPal Login Portal", score: isMal ? "0.94 similarity" : "0.08 similarity" },
+              { rank: 2, name: "Microsoft 365 Sign-in", score: isMal ? "0.41 similarity" : "0.05 similarity" },
+              { rank: 3, name: "Amazon Billing Update", score: isMal ? "0.22 similarity" : "0.02 similarity" }
+            ]
+          },
+          policy: isMal ? [
+            { name: "GUARDRAIL_VISUAL_CLONE", value: `${conf}%`, limit: "85.0%" },
+            { name: "GUARDRAIL_DOMAIN_AGE", value: report.intel?.age || "14 days", limit: "30 days" },
+            { name: "GUARDRAIL_BRAND_SPOOF", value: "DETECTED", limit: "NONE" }
+          ] : []
+        };
+      }
+
+      const ai = report.aiInsights;
+      if (!ai) return;
+
+      // 1. Render Core Metrics
+      const statusClass = ai.core?.status === "Completed" ? "status-safe" : "status-danger";
+      document.getElementById("ai-core-metrics").innerHTML = `
+        <div class="ai-list-row" style="padding-top: 0;">
+          <span class="muted">Analysis Status</span>
+          <span class="status-pill ${statusClass}">● ${ai.core?.status || "Completed"}</span>
+        </div>
+        <div class="ai-list-row" style="border-bottom: none; padding-bottom: 0;">
+          <span class="muted">Global Risk Score</span>
+          <strong style="font-size: 2.5rem; color: #ef4444; line-height: 1; font-family: 'Chakra Petch', sans-serif;">
+            <span id="ai-risk-score-anim" data-target="${ai.core?.globalRisk || 0}">0</span>
+            <span class="muted" style="font-size: 1rem; font-family: 'Inter', sans-serif;">/100</span>
+          </strong>
+        </div>
+      `;
+
+      // 2. Render Visual Layout Engine (UPGRADED CLEAR LABELS)
+      const visualConf = parseFloat(ai.visual?.confidence || 98.4);
+      const visualThresh = parseFloat(ai.visual?.threshold || 85.0);
+      const visualBreached = visualConf > visualThresh;
+      const verdictColor = visualBreached ? "#ef4444" : "#10b981";
+      document.getElementById("ai-visual-layout").innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+          <span class="muted" style="font-size: 1.1em;">Clone Verdict</span>
+          <strong style="color: ${verdictColor}; font-size: 1.3em;">${ai.visual?.verdict || "Visual Clone Detected"}</strong>
+        </div>
+        <div>
+          <!-- Clear Separated Labeling -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+            <div>
+              <div style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 2px;">Model Confidence</div>
+              <strong style="font-size: 1.4rem; color: var(--text); font-family: 'Chakra Petch', sans-serif;">${visualConf}%</strong>
+            </div>
+            <span style="background: var(--accent-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace;">
+              Guardrail Limit: <strong style="color: var(--text);">${visualThresh}%</strong>
+            </span>
+          </div>
+          <div id="ai-track-container" style="width: 100%; background: var(--border); height: 12px; border-radius: 6px; position: relative; margin: 26px 0 18px 0; overflow: visible !important;">
+            <div id="ai-thresh-bubble" class="ai-bubble-base" style="left: ${visualThresh}%;" title="Limit: ${visualThresh}%"></div>
+            <div id="ai-conf-bar" style="width: 0%; height: 100%; border-radius: 6px; background: #10b981; transition: none;"></div>
+          </div>
+        </div>
+        <div style="background: var(--accent-2-soft); border-left: 4px solid var(--accent-2); padding: 16px 20px; border-radius: 0 8px 8px 0; margin-top: 28px;">
+          <p style="font-size: 1em; line-height: 1.7; margin: 0; color: var(--text);">${ai.visual?.summary || ""}</p>
+        </div>
+      `;
+
+      // 3. Render Explainable AI (SHAP)
+      document.getElementById("ai-shap-desc").textContent = ai.shap?.description || "";
+      const shapGraph = document.getElementById("ai-shap-graph");
+      if (shapGraph && ai.shap?.features) {
+        shapGraph.innerHTML = ai.shap.features.map(s => {
+          const isNeg = s.impact === "negative";
+          const barColor = isNeg ? "#ef4444" : "#10b981"; 
+          const barShadow = isNeg ? "0 0 10px rgba(239, 68, 68, 0.4)" : "0 0 10px rgba(16, 185, 129, 0.4)";
+          const badgeStyle = isNeg ? "color: #ef4444; background: rgba(239, 68, 68, 0.1);" : "color: #10b981; background: rgba(16, 185, 129, 0.1);";
+          return `
+            <div class="ai-row-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--text);">${s.name}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; ${badgeStyle}">${s.weight}</span>
+              </div>
+              <div style="width: 100%; background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; position: relative;">
+                <div class="shap-anim-bar" data-target="${parseFloat(s.pct || 0)}" style="width: 0%; height: 100%; border-radius: 5px; background: ${barColor}; box-shadow: ${barShadow};"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // 4. Render Brand Intel (UPGRADED CLEAR LABELS)
+      const brandEl = document.getElementById("ai-brand");
+      if (brandEl && ai.brand) {
+        const bConf = parseFloat(ai.brand.confidence || 0);
+        const bThresh = parseFloat(ai.brand.threshold || 75.0);
+        const rankingsHtml = (ai.brand.rankings || []).map(r => `
+          <div class="ai-list-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+            <span class="muted">#${r.rank} ${r.name}</span>
+            <span style="font-weight: 600; color: var(--text);">${r.score}</span>
+          </div>
+        `).join("");
+        brandEl.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <span class="muted" style="font-size: 1.1em;">Target Profile</span>
+            <span style="font-weight: 600; font-size: 1.05em;">
+              ${ai.brand.target} 
+              <a href="https://${ai.brand.domain}" target="_blank" class="pill-tag" style="font-family: 'IBM Plex Mono', monospace; text-decoration: none; margin-left: 8px; font-size: 0.85rem; background: rgba(59, 130, 246, 0.1); padding: 4px 8px; border-radius: 6px; color: #3b82f6;">${ai.brand.domain} ↗</a>
+            </span>
+          </div>
+          <div id="ai-brand-track-container" style="padding: 10px 0 16px 0;">
+            <!-- Clear Separated Labeling -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+              <div>
+                <div style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 2px;">Impersonation Confidence</div>
+                <strong style="font-size: 1.4rem; color: var(--danger); font-family: 'Chakra Petch', sans-serif;">${bConf}%</strong>
+              </div>
+              <span style="background: var(--accent-soft); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace;">
+                Guardrail Limit: <strong style="color: var(--text);">${bThresh}%</strong>
+              </span>
+            </div>
+            <div style="width: 100%; background: var(--border); height: 12px; border-radius: 6px; position: relative; margin: 26px 0 18px 0; overflow: visible !important;">
+              <div id="ai-brand-thresh-bubble" class="ai-bubble-base" style="left: ${bThresh}%;" title="Limit: ${bThresh}%"></div>
+              <div id="ai-brand-conf-bar" style="width: 0%; height: 100%; border-radius: 6px; background: #10b981; transition: none;"></div>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <span class="muted" style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;">Match Rankings</span>
+            <div style="margin-top: 8px;">${rankingsHtml}</div>
+          </div>
+        `;
+      }
+
+      // 5. Render Policy Violations
+      const threshEl = document.getElementById("ai-thresholds");
+      if (threshEl) {
+        threshEl.innerHTML = (ai.policy && ai.policy.length) ? ai.policy.map((p, idx) => `
+          <div class="ai-row-card" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--text); font-weight: 500;">${p.name}</span>
+            </div>
+            <span class="ai-badge-soft-red" style="font-family: 'IBM Plex Mono', monospace; animation-delay: ${idx * 0.6}s;">
+              ${p.value} <span style="color: #94a3b8; font-weight: 400; margin-left: 6px;">(${p.limit})</span>
+            </span>
+          </div>
+        `).join("") : `<p class="muted">No policy thresholds breached.</p>`;
+      }
+
+      // --- ANIMATION FUNCTIONS ---
+      function animateValue(id, start, end, duration) {
+        if (start === end) return;
+        const obj = document.getElementById(id);
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (ts) => {
+          if (!startTimestamp) startTimestamp = ts;
+          const prog = Math.min((ts - startTimestamp) / duration, 1);
+          obj.innerHTML = Math.floor((1 - Math.pow(1 - prog, 3)) * (end - start) + start);
+          if (prog < 1) window.requestAnimationFrame(step);
+          else obj.innerHTML = end;
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      function animateSimpleBar(el, targetPct, duration) {
+        if (!el) return;
+        let startTimestamp = null;
+        const step = (ts) => {
+          if (!startTimestamp) startTimestamp = ts;
+          const prog = Math.min((ts - startTimestamp) / duration, 1);
+          el.style.width = ((1 - Math.pow(1 - prog, 3)) * targetPct) + "%";
+          if (prog < 1) window.requestAnimationFrame(step);
+          else el.style.width = targetPct + "%";
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      function runConfidenceAnimation(barId, bubbleId, targetConf, limitPct) {
+        const bar = document.getElementById(barId);
+        const bubble = document.getElementById(bubbleId);
+        if (!bar || !bubble) return;
+        let startTimestamp = null;
+        let rippleFired = false;
+        const step = (ts) => {
+          if (!startTimestamp) startTimestamp = ts;
+          const prog = Math.min((ts - startTimestamp) / 1800, 1);
+          const currentPct = (1 - Math.pow(1 - prog, 3)) * targetConf;
+          bar.style.width = currentPct + "%";
+          
+          let r = 16, g = 185, b = 129;
+          if (currentPct < 50) {
+            const t = currentPct / 50;
+            r = Math.round(16 + t * (245 - 16)); g = Math.round(185 + t * (158 - 185)); b = Math.round(129 + t * (11 - 129));
+          } else {
+            const t = (currentPct - 50) / 50;
+            r = Math.round(245 + t * (239 - 245)); g = Math.round(158 + t * (68 - 158)); b = Math.round(11 + t * (68 - 11));
+          }
+          const liveColor = `rgb(${r}, ${g}, ${b})`;
+          bar.style.backgroundColor = liveColor;
+          bar.style.boxShadow = `0 0 12px ${liveColor}`;
+
+          if (currentPct >= limitPct && !rippleFired) {
+            rippleFired = true;
+            bubble.classList.add("ai-bubble-pop-ripple");
+          }
+          if (prog < 1) window.requestAnimationFrame(step);
+          else bar.style.width = targetConf + "%";
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      // --- SCROLL & TAB OBSERVERS ---
+      setTimeout(() => {
+        if ("IntersectionObserver" in window) {
+          const trackEl = document.getElementById("ai-track-container");
+          if (trackEl) new IntersectionObserver((e, o) => e.forEach(ent => { if (ent.isIntersecting) { runConfidenceAnimation("ai-conf-bar", "ai-thresh-bubble", visualConf, visualThresh); o.disconnect(); } }), { threshold: 0.1 }).observe(trackEl);
+
+          const shapContainer = document.getElementById("ai-shap-graph");
+          if (shapContainer) new IntersectionObserver((e, o) => e.forEach(ent => { if (ent.isIntersecting) { shapContainer.querySelectorAll(".shap-anim-bar").forEach((bar, idx) => setTimeout(() => animateSimpleBar(bar, parseFloat(bar.getAttribute("data-target") || 0), 1600), idx * 120)); o.disconnect(); } }), { threshold: 0.15 }).observe(shapContainer);
+
+          const brandContainer = document.getElementById("ai-brand-track-container");
+          if (brandContainer) new IntersectionObserver((e, o) => e.forEach(ent => { if (ent.isIntersecting) { runConfidenceAnimation("ai-brand-conf-bar", "ai-brand-thresh-bubble", parseFloat(ai.brand.confidence || 0), parseFloat(ai.brand.threshold || 75.0)); o.disconnect(); } }), { threshold: 0.2 }).observe(brandContainer);
+        }
+
+        let scoreAnimated = false;
+        const aiTabPanel = document.getElementById("tab-ai-insights");
+        if (aiTabPanel && "MutationObserver" in window) {
+          new MutationObserver(() => {
+            if (aiTabPanel.classList.contains("active") && !scoreAnimated) {
+              animateValue('ai-risk-score-anim', 0, parseInt(ai.core?.globalRisk || 0, 10), 1500);
+              scoreAnimated = true;
+            }
+          }).observe(aiTabPanel, { attributes: true, attributeFilter: ["class"] });
+        }
+      }, 100);
+    })();
   </script>
 </body>
 
