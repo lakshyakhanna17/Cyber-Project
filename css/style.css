@@ -527,6 +527,8 @@ html[data-theme="light"] .hero .glow {
     border-color .25s ease;
 
   box-shadow: var(--shadow-md);
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .scanbox::before {
@@ -568,38 +570,75 @@ html[data-theme="light"] .hero .glow {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
 }
 
-.input,
 .file-drop,
 textarea,
 select {
-
   width: 100%;
-
   background: var(--bg-2);
-
   border: 1px solid var(--border);
-
   border-radius: 18px;
-
   padding: 16px 18px;
-
   color: var(--text);
-
   transition:
     border-color .2s,
     box-shadow .2s,
     transform .2s;
-
 }
 
+/* Beautiful Premium Input Field */
 .input {
-  border-radius: 30px;
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 20px 28px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
-.input:focus,
+html[data-theme="light"] .input {
+  background: #ffffff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+.input:hover {
+  border-color: rgba(114, 99, 255, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+html[data-theme="light"] .input:hover {
+  border-color: rgba(91, 75, 219, 0.5);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--panel);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 3px var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+html[data-theme="light"] .input:focus {
+  background: #ffffff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 3px var(--accent-soft);
+}
+
 textarea:focus,
 select:focus,
 .file-drop:hover {
@@ -645,8 +684,11 @@ select:focus,
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 13px 18px;
+  padding: 13px 20px;
   transition: transform .2s, box-shadow .2s, border-color .2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .check input {
@@ -2716,4 +2758,78 @@ html[data-theme="light"] .export-preview-viewport {
 
 .theme-toggle .slider.round:before {
   border-radius: 50%;
+}
+
+/* ----- Pill Slider ----- */
+.pill-slider-container {
+  margin-bottom: 35px;
+  display: flex;
+  justify-content: center;
+}
+.pill-slider {
+  display: flex;
+  border-radius: 999px;
+  position: relative;
+  padding: 6px;
+  width: max-content;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Dark theme pill slider */
+html:not([data-theme="light"]) .pill-slider {
+  background: linear-gradient(180deg, rgba(16, 26, 46, 0.8) 0%, rgba(10, 18, 32, 0.8) 100%);
+  border: 1px solid rgba(110, 135, 200, 0.25);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.03), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme pill slider */
+html[data-theme="light"] .pill-slider {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.pill-slider .slider-bg {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc(50% - 5px);
+  background: linear-gradient(135deg, var(--accent), #5b4bdb);
+  box-shadow: var(--shadow-sm);
+  border-radius: 999px;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 1;
+}
+
+html:not([data-theme="light"]) .pill-slider .slider-bg {
+  border: 1px solid rgba(114, 99, 255, 0.6);
+  box-shadow: 0 4px 16px var(--accent-soft);
+}
+
+.pill-slider[data-selected="file"] .slider-bg {
+  transform: translateX(100%);
+}
+.pill-slider button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 48px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.3s;
+  border-radius: 999px;
+}
+.pill-slider button:hover {
+  color: var(--text);
+}
+.pill-slider button.active {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
